@@ -1,40 +1,24 @@
 import './App.css';
 import { useState, useRef, useEffect } from 'react';
-import { indexOf } from 'lodash';
-// import { getIn } from 'immutable';
 
 function App() {
-  return (
-    <div className="App">
-      <AnimationComponent />
-    </div>
-  );
-}
-
-function AnimationComponent() {
   let [state, setState] = useState('Idle');
+  const animationStates = ['Idle', 'Jump', 'Fall', 'Run', 'Dizzy', 'Sit', 'Roll', "Bite", "KO", "GetHit"];
 
-  function handleChange(event) {
-    console.log("selected, prevstate: " + state);
-    setState(event.target.value);
-  }
-
-  console.log("current state: " + state);
-  return(
-    <div onChange={handleChange} >
-      <Dropdown />
+  return (
+    <div className="App" onChange={({target: {value}}) => setState(value)}>
+      <select>
+        {animationStates.map((element, index) => <option key={index} value={element}>{element}</option>)}
+      </select>
       <Canvas state={state}/>
     </div>
   );
 }
 
 function Canvas({state}) {
-  console.log("inside canvas, state is " + state);
-
   const states = [{name: "idle",frames: 7,},{name: "jump",frames: 7,},{name: "fall",frames: 7,},{name: "run",frames: 9,},{name: "dizzy",frames: 11,},{name: "sit",frames: 5,},{name: "roll",frames: 7,},{name: "bite",frames: 7,},{name: "ko",frames: 12,},{name: "getHit",frames: 4,},];
   
   const canvasRef = useRef(null);
-  const requestRef = useRef();
   
   const canvasWidth = 600;
   const canvasHeight = 600;
@@ -54,7 +38,6 @@ function Canvas({state}) {
   }
 
   function animate() {
-    console.log("animating " + state);
     const stateIndex = getStateIndex();
     const frames = states[stateIndex].frames;
 
@@ -69,36 +52,15 @@ function Canvas({state}) {
 
     ctx.drawImage(image, x, y, spriteWidth, spriteHeight, 0, 0, spriteWidth, spriteHeight);
     gameFrame++;
-    requestRef.current = requestAnimationFrame(() => animate(state));
+    requestAnimationFrame(() => animate(state));
   }
 
   useEffect(() => {
     requestAnimationFrame(animate);
-    // return () => cancelAnimationFrame(requestRef.current);
   }, []);
   
-  
-
   return (
-    <div>
       <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight}></canvas>
-      <h3>current state: {state}</h3>
-    </div>
-  );
-}
-
-function Dropdown({}) {
-  return (
-        <select>
-          <DropdownItem value="Idle" />
-          <DropdownItem value="Jump" />
-        </select>
-  );
-}
-
-function DropdownItem({value}) {
-  return (
-      <option>{value}</option>
   );
 }
 
