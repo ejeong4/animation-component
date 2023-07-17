@@ -10,32 +10,22 @@ function App() {
       <select>
         {animationStates.map((element, index) => <option key={index} value={element}>{element}</option>)}
       </select>
-      <Canvas state={state}/>
+      <Canvas state={state} gameFrame={0} stagger={5} canvasWidth={600} canvasHeight={600} spriteWidth={575} spriteHeight={523} imageFile="./shadow_dog.png" />
     </div>
   );
 }
 
-function Canvas({state}) {
+function Canvas({state, gameFrame, stagger, canvasWidth, canvasHeight, spriteWidth, spriteHeight, imageFile}) {
   const states = [{name: "idle",frames: 7,},{name: "jump",frames: 7,},{name: "fall",frames: 7,},{name: "run",frames: 9,},{name: "dizzy",frames: 11,},{name: "sit",frames: 5,},{name: "roll",frames: 7,},{name: "bite",frames: 7,},{name: "ko",frames: 12,},{name: "getHit",frames: 4,},];
-  
   const canvasRef = useRef(null);
-  
-  const canvasWidth = 600;
-  const canvasHeight = 600;
-  const spriteWidth = 575;
-  const spriteHeight = 523;
   const image = new Image();
-
-  image.src = require("./shadow_dog.png");
-  let gameFrame = 0;
+  image.src = require(`${imageFile}`);
 
   function getStateIndex() {
     for (let s of states) {
       if (s.name == state.toString().toLowerCase()) {
         return states.indexOf(s);
-      }
-    }
-  }
+  }}}
 
   function animate() {
     const stateIndex = getStateIndex();
@@ -43,7 +33,6 @@ function Canvas({state}) {
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const stagger = 5;
     const y = spriteHeight * stateIndex;
     const x = spriteWidth * (Math.floor(gameFrame / stagger) % frames);
     
