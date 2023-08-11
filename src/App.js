@@ -1,15 +1,16 @@
 import './App.css';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 function App() {
   let [state, setState] = useState('Idle');
   const animationStates = ['Idle', 'Jump', 'Fall', 'Run', 'Dizzy', 'Sit', 'Roll', "Bite", "KO", "GetHit"];
 
   return (
-    <div className="App" onChange={({target: {value}}) => setState(value)}>
+    <div className="App" onChange={({target: {value}}) => {setState(value)}}>
       <select>
         {animationStates.map((element, index) => <option key={index} value={element}>{element}</option>)}
       </select>
+      <h1>{state}</h1>
       <Canvas state={state} gameFrame={0} stagger={5} canvasWidth={600} canvasHeight={600} spriteWidth={575} spriteHeight={523} imageFile="./shadow_dog.png" />
     </div>
   );
@@ -27,8 +28,9 @@ function Canvas({state, gameFrame, stagger, canvasWidth, canvasHeight, spriteWid
         return states.indexOf(s);
   }}}
 
-  function animate() {
-    const stateIndex = getStateIndex();
+  const animate = useCallback(() => {
+    console.log(state);
+    let stateIndex = getStateIndex();
     const frames = states[stateIndex].frames;
 
     const canvas = canvasRef.current;
@@ -41,12 +43,10 @@ function Canvas({state, gameFrame, stagger, canvasWidth, canvasHeight, spriteWid
 
     ctx.drawImage(image, x, y, spriteWidth, spriteHeight, 0, 0, spriteWidth, spriteHeight);
     gameFrame++;
-    requestAnimationFrame(() => animate(state));
-  }
+    requestAnimationFrame(() => animate());
+}, [state]);
 
-  useEffect(() => {
-    requestAnimationFrame(animate);
-  }, []);
+  useEffect(() => animate(), [state])
   
   return (
       <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight}></canvas>
